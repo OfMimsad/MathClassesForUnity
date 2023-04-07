@@ -1,55 +1,42 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-// A very simplistic car driving on the x-z plane.
-
 public class Drive : MonoBehaviour
 {
+    float speed = 5f;
+    public GameObject fuel;
+    public Vector3 direction;
+    public float stoppingDistance = 0.1f;
 
-    Vector2 right = new Vector2(1, 0);
-    Vector2 up = new Vector2(0, 1);
-    Vector3 posi = new Vector3();
-
-     public float speed = 0.1f;
-
-
-    private void Start()
+    void Start()
     {
-        posi = this.transform.position;
-    }
+        direction = fuel.transform.position - this.transform.position;
+        Coords dirNormal = HolisticMath.GetNormal(new Coords(direction));
+        direction = dirNormal.ToVector();
+        float a = HolisticMath.Angle(new Coords(0, 1, 0), new Coords(direction));
+        Debug.Log("Angle to Fuel: " + a);
+        bool turnDir = false;
+        if (HolisticMath.Cross(new Coords(0, 1, 0), new Coords(direction)).z > 0)
+            turnDir = false;
+        else if (HolisticMath.Cross(new Coords(0, 1, 0), new Coords(direction)).z < 0)
+            turnDir = true;
 
+        Debug.Log("Turn Direction: "+ turnDir);
+
+        Coords newDir = HolisticMath.Rotate(new Coords(0, 1, 0), a, turnDir);
+
+        this.transform.up = new Vector3(newDir.x, newDir.y, newDir.z);
+
+        //do turn calcs
+
+    }
 
     void Update()
     {
-
-        if (Input.GetKey(KeyCode.W))
-        {
-            Move(up);
-        }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            Move(-up);
-        }
-        else if (Input.GetKey(KeyCode.A))
-        {
-            Move(-right);
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            Move(right);
-        }
-
-
-        this.transform.position = posi;
+        if(HolisticMath.Distance(new Coords(this.transform.position), 
+                                 new Coords(fuel.transform.position)) > stoppingDistance)
+            this.transform.position += direction * speed * Time.deltaTime;
 
 
     }
-
-
-  public void Move(Vector2 s)
-    {
-        posi.x += s.x * speed;
-        posi.y += s.y * speed;
-    }
-  
 }
