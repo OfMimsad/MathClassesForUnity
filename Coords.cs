@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Coords {
+public class Coords
+{
 
     public float x;
     public float y;
@@ -31,12 +32,22 @@ public class Coords {
 
     public override string ToString()
     {
-        return"(" + x + "," + y + "," + z +")";
+        return "(" + x + "," + y + "," + z + ")";
     }
 
     public Vector3 ToVector()
     {
         return new Vector3(x, y, z);
+    }
+
+    static public Coords operator +(Coords a, Coords b)
+    {
+        return new Coords(a.x + b.x, a.y + b.y, a.z + b.z);
+    }
+
+    static public Coords operator -(Coords a, Coords b)
+    {
+        return new Coords(a.x - b.x, a.y - b.y, a.z - b.z);
     }
 
     static public void DrawLine(Coords startPoint, Coords endPoint, float width, Color colour)
@@ -50,6 +61,12 @@ public class Coords {
         lineRenderer.SetPosition(1, new Vector3(endPoint.x, endPoint.y, endPoint.z));
         lineRenderer.startWidth = width;
         lineRenderer.endWidth = width;
+    }
+
+
+    static public Coords Perp(Coords v)
+    {
+        return new Coords(-v.y, v.x);
     }
 
     static public void DrawPoint(Coords position, float width, Color colour)
